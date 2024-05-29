@@ -1,16 +1,15 @@
 from uuid import uuid4
 
-import numpy as np
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from PIL import Image
 
 from components import AISystemMock, CameraMock, Database
 
+# Instantiate the Flask app.
 app = Flask(__name__)
 CORS(app)
 
-# Initialize the camera and AI system
+# Initialize the camera, AI system and database.
 camera = CameraMock()
 ai_system = AISystemMock()
 database = Database("test_results.db")
@@ -18,34 +17,30 @@ database = Database("test_results.db")
 
 @app.route("/capture_image", methods=["POST"])
 def capture_image():
+    """POST route to capture the image and predict the result"""
+
+    # Extract requests data.
     data = request.json
     with_defect = data.get("with_defect", False)
     low_lighting = data.get("low_lighting", False)
 
+    # Simulate a captured image.
     image = camera.capture(with_defect, low_lighting)
-    image_array = np.array(image)
-    image_uuid = uuid4()
+    image_uuid = uuid4().hex
 
-    # Convert image data to list for JSON serialization
-    raw_image = image_array.tolist()
-
-    return jsonify(raw_image=raw_image, image_UUID=str(image_uuid))
-
-
-@app.route("/predict_defect", methods=["POST"])
-def predict_defect():
-    data = request.json
-    raw_image = data["raw_image"]
-    image = Image.fromarray(np.array(raw_image, dtype=np.uint8))
-
+    # Predict defect.
     defect_present = ai_system.predict(image).item()
-    prediction_uuid = uuid4()
+    database.log_result(image_uuid, defect_present)
 
-    return jsonify(has_defect=defect_present, prediction_UUID=str(prediction_uuid))
+    # Return the prediction and it's UUID.
+    return jsonify(has_defect=defect_present, prediction_UUID=uuid4().hex)
 
 
 @app.route("/shutdown", methods=["POST"])
 def shutdown():
+    """POST route to shutdown the server"""
+
+    # Close the database connection.
     database.close()
 
     return "Server shutting down..."
