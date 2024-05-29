@@ -21,11 +21,11 @@ def capture_image():
 
     # Extract requests data.
     data = request.json
-    with_defect = data.get("with_defect", False)
+    has_defect = data.get("has_defect", False)
     low_lighting = data.get("low_lighting", False)
 
     # Simulate a captured image.
-    image = camera.capture(with_defect, low_lighting)
+    image = camera.capture(has_defect, low_lighting)
     image_uuid = uuid4().hex
 
     # Predict defect.
