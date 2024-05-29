@@ -5,7 +5,7 @@ from PIL import Image
 
 
 class CameraMock:
-    def capture(self, with_defect=False, low_lighting=False):
+    def capture(self, with_defect: bool = False, low_lighting: bool = False) -> Image:
         """Generates an image with random noise and possibly a defect."""
 
         # Create random noise background
