@@ -3,3 +3,4 @@ numpy==1.26.4
 Flask==3.0.3
 uuid==1.30
 Flask-Cors==4.0.0
+tensorflow==2.16.1
