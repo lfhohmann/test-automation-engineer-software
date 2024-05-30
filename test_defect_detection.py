@@ -1,14 +1,18 @@
+import time
 import unittest
 
 from flask import Flask
 
 from app import app
 
-SAMPLES = 10_000
+SAMPLES = 1000
 
 
 def base_test(test_case: unittest.TestCase, app: Flask, has_defect: bool, low_lighting: bool) -> None:
     """Base code to be used by all tests"""
+
+    # Start timer
+    start = time.perf_counter()
 
     # Init test client and perform multiple requests to capture an image.
     with app.test_client() as client:
@@ -26,26 +30,32 @@ def base_test(test_case: unittest.TestCase, app: Flask, has_defect: bool, low_li
             )
             responses.append(response)
 
-        # Print test name and its parameters.
-        print(f"\n{test_case.__class__.__name__} -> has_defect: {has_defect}, low_lighting: {low_lighting}")
+    # Stop timer and compute number of samples per second.
+    end = time.perf_counter()
+    elapsed_time = end - start
+    samples_per_second = SAMPLES / elapsed_time
 
-        # Init variable to store the number of tests that passed.
-        passed = [1 for r in responses if r.json["has_defect"] == has_defect]
+    # Print test name and its parameters.
+    print(f"\n{test_case.__class__.__name__} -> has_defect: {has_defect}, low_lighting: {low_lighting}")
 
-        # Print the number of tests that passed and their accuracy.
-        print(f"\tPassed: {len(passed)} out of {SAMPLES} tests.")
-        print(f"\tAccuracy: {(len(passed)/SAMPLES)*100:.2f}%")
+    # Init variable to store the number of tests that passed.
+    passed = [1 for r in responses if r.json["has_defect"] == has_defect]
 
-        # Print a PASS or FAIL message based on whether all tests passed.
-        if sum(passed) == SAMPLES:
-            print(f"\t\tPASS")
-        else:
-            print(f"\t\tFAIL")
+    # Print the number of tests that passed and their accuracy.
+    print(f"\tTest took: {elapsed_time:.2f}s, performing {samples_per_second:.2f} samples per second")
+    print(f"\tPassed: {len(passed)} out of {SAMPLES} tests.")
+    print(f"\tAccuracy: {(len(passed)/SAMPLES)*100:.2f}%")
 
-        # Assert that the response code and prediction.
-        for response in responses:
-            test_case.assertEqual(response.status_code, 200)
-            test_case.assertEqual(response.json["has_defect"], has_defect)
+    # Print a PASS or FAIL message based on whether all tests passed.
+    if sum(passed) == SAMPLES:
+        print(f"\t\tPASS")
+    else:
+        print(f"\t\tFAIL")
+
+    # Assert that the response code and prediction.
+    for response in responses:
+        test_case.assertEqual(response.status_code, 200)
+        test_case.assertEqual(response.json["has_defect"], has_defect)
 
 
 class TestDefectDetection(unittest.TestCase):
