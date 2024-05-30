@@ -97,6 +97,7 @@ class TestInferenceSpeed(unittest.TestCase):
         # Print test name and its results.
         print(f"\n{self.__class__.__name__}.{self.test_regular_predict.__name__}()")
         print(f"\tTest took: {elapsed_time:.2f}s, performing {samples_per_second:.2f} samples per second")
+        print(flush=True)
 
     def test_cnn_predict(self):
 
@@ -119,6 +120,7 @@ class TestInferenceSpeed(unittest.TestCase):
         # Print test name and its results.
         print(f"\n{self.__class__.__name__}.{self.test_cnn_predict.__name__}()")
         print(f"\tTest took: {elapsed_time:.2f}s, performing {samples_per_second:.2f} samples per second")
+        print(flush=True)
 
 
 if __name__ == "__main__":
