@@ -52,6 +52,8 @@ def base_test(test_case: unittest.TestCase, app: Flask, has_defect: bool, low_li
     else:
         print(f"\t\tFAIL")
 
+    print(flush=True)
+
     # Assert that the response code and prediction.
     for response in responses:
         test_case.assertEqual(response.status_code, 200)
