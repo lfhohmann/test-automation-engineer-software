@@ -4,6 +4,7 @@ import unittest
 from flask import Flask
 
 from app import app
+from components import AISystemMock, CameraMock
 
 SAMPLES = 1000
 
@@ -11,7 +12,7 @@ SAMPLES = 1000
 def base_test(test_case: unittest.TestCase, app: Flask, has_defect: bool, low_lighting: bool) -> None:
     """Base code to be used by all tests"""
 
-    # Start timer
+    # Start timer.
     start = time.perf_counter()
 
     # Init test client and perform multiple requests to capture an image.
@@ -72,6 +73,52 @@ class TestDefectDetection(unittest.TestCase):
 
     def test_has_defect_low_lighting(self):
         base_test(self, app, has_defect=True, low_lighting=True)
+
+
+class TestInferenceSpeed(unittest.TestCase):
+    def test_regular_predict(self):
+
+        # Instantiate AI system and camera objects.
+        ai_system = AISystemMock()
+        camera = CameraMock()
+
+        # Start timer.
+        start = time.perf_counter()
+
+        # Perform multiple predictions.
+        for _ in range(SAMPLES):
+            ai_system.predict(camera.capture(has_defect=True, low_lighting=True))
+
+        # Stop timer and compute number of samples per second.
+        end = time.perf_counter()
+        elapsed_time = end - start
+        samples_per_second = SAMPLES / elapsed_time
+
+        # Print test name and its results.
+        print(f"\n{self.__class__.__name__}.{self.test_regular_predict.__name__}()")
+        print(f"\tTest took: {elapsed_time:.2f}s, performing {samples_per_second:.2f} samples per second")
+
+    def test_cnn_predict(self):
+
+        # Instantiate AI system and camera objects.
+        ai_system = AISystemMock()
+        camera = CameraMock()
+
+        # Start timer.
+        start = time.perf_counter()
+
+        # Perform multiple predictions.
+        for _ in range(SAMPLES):
+            ai_system.predict_cnn(camera.capture(has_defect=True, low_lighting=True))
+
+        # Stop timer and compute number of samples per second.
+        end = time.perf_counter()
+        elapsed_time = end - start
+        samples_per_second = SAMPLES / elapsed_time
+
+        # Print test name and its results.
+        print(f"\n{self.__class__.__name__}.{self.test_cnn_predict.__name__}()")
+        print(f"\tTest took: {elapsed_time:.2f}s, performing {samples_per_second:.2f} samples per second")
 
 
 if __name__ == "__main__":
