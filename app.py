@@ -29,7 +29,7 @@ def capture_image():
     image_uuid = uuid4().hex
 
     # Predict defect.
-    defect_present = ai_system.predict(image)
+    defect_present = ai_system.predict_cnn(image)
     database.log_result(image_uuid, defect_present)
 
     # Return the prediction and it's UUID.
