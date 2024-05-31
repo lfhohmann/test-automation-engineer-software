@@ -28,7 +28,7 @@ async def test_capture_request():
                 post_data = json.loads(request.post_data)
                 assert post_data == expected_post_data, f"Post data does not match: {post_data}"
 
-                print("\nCAPTURE POST request made to the backend with expected data.")
+                print("\n\nIMAGE CAPTURE POST request made to the backend with expected data.")
 
             await route.continue_()
 
@@ -62,6 +62,9 @@ async def test_capture_request():
             assert False, "No results found in the database."
 
         # Check if the image ID matches the response from the backend.
+        if image_id == response["image_id"]:
+            print("\tImage ID matches the response from the backend.")
+
         assert image_id == response["image_id"]
 
 
