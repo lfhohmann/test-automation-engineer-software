@@ -33,7 +33,7 @@ def capture_image():
     database.log_result(image_uuid, defect_present)
 
     # Return the prediction and it's UUID.
-    return jsonify(has_defect=defect_present, prediction_UUID=uuid4().hex)
+    return jsonify(has_defect=defect_present, prediction_id=uuid4().hex, image_id=image_uuid)
 
 
 @app.route("/shutdown", methods=["POST"])
